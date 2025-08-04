@@ -1,0 +1,105 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>ملف الطالب</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: 'Arial';
+      direction: rtl;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+    h2, h3 {
+      color: #333;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      padding: 5px 0;
+    }
+    button {
+      padding: 10px 20px;
+      background-color: #1e90ff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h2 id="name"></h2>
+  <h3>درجات الترم الأول</h3>
+  <ul id="term1"></ul>
+
+  <h3>درجات الترم الثاني</h3>
+  <ul id="term2"></ul>
+
+  <h3>ورش الحل</h3>
+  <ul id="workshops"></ul>
+
+  <h3 id="total"></h3>
+  <button onclick="downloadPDF()">تحميل النتيجة كـ PDF</button>
+
+  <script>
+    const student = JSON.parse(localStorage.getItem("student"));
+    if (!student) {
+      window.location.href = "index.html";
+    }
+
+    document.getElementById("name").innerText = "مرحبًا، " + student.name;
+
+    const term1List = document.getElementById("term1");
+    const term2List = document.getElementById("term2");
+    const workshopsList = document.getElementById("workshops");
+
+    let pdfContent = `اسم الطالب: ${student.name}\n\nدرجات الترم الأول:\n`;
+
+    // تقسيم الامتحانات إلى ترمين
+    for (let i = 1; i <= 15; i++) {
+      const score = student["exam" + i];
+      const line = `امتحان ${i}: ${score}`;
+      term1List.innerHTML += `<li>${line}</li>`;
+      pdfContent += line + "\n";
+    }
+
+    pdfContent += "\nدرجات الترم الثاني:\n";
+    for (let i = 16; i <= 30; i++) {
+      const score = student["exam" + i];
+      const line = `امتحان ${i}: ${score}`;
+      term2List.innerHTML += `<li>${line}</li>`;
+      pdfContent += line + "\n";
+    }
+
+    pdfContent += "\nورش الحل:\n";
+    for (let i = 1; i <= 10; i++) {
+      const score = student["workshop" + i];
+      const line = `ورشة ${i}: ${score}`;
+      workshopsList.innerHTML += `<li>${line}</li>`;
+      pdfContent += line + "\n";
+    }
+
+    const totalLine = `\nالتقييم النهائي: ${student.total} من 100`;
+    document.getElementById("total").innerText = totalLine;
+    pdfContent += totalLine;
+
+    function downloadPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      doc.setFont("courier");
+      doc.setFontSize(12);
+      const lines = pdfContent.split("\n");
+      lines.forEach((line, index) => {
+        doc.text(line, 10, 10 + (index * 10));
+      });
+      doc.save(`${student.name}_result.pdf`);
+    }
+  </script>
+</body>
+</html>
