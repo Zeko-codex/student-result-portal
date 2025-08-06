@@ -5,11 +5,7 @@ function login() {
   fetch("https://script.google.com/macros/s/AKfycbxcSeSMJNUTJOhgbQhLl4TnLLvkm_VFxwysRtGfHNKrprD5rVx9ErxhAFHQPBA_5Nw9/exec")
     .then(res => res.json())
     .then(data => {
-      const user = data.find(d => 
-        d.username.toString().trim() === username &&
-        d.password.toString().trim() === password
-      );
-
+      const user = data.find(d => d.username === username && d.password.toString() === password);
       if (user) {
         localStorage.setItem("student", JSON.stringify(user));
         window.location.href = "profile.html";
